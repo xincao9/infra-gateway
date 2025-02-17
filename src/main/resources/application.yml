@@ -1,0 +1,69 @@
+server:
+  port: 10100
+spring:
+  application:
+    name: infra-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      enabled: true
+      discovery:
+        locator:
+          lower-case-service-id: true
+      routes:
+        # Add your routes here.
+        - id: product_route
+          uri: lb://product
+          predicates:
+            - Path=/product/**
+        - id: httpbin_route
+          uri: https://httpbin.org
+          predicates:
+            - Path=/httpbin/**
+          filters:
+            - RewritePath=/httpbin/(?<segment>.*), /$\{segment}
+      metrics:
+        enabled: true
+        tags:
+          enabled: true
+      httpclient:
+        connect-timeout: 3000
+        response-timeout: 10s
+        pool:
+          max-idle-time: 3000
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: localhost:8080
+      datasource:
+        flow:
+          nacos:
+            data-id: ${spring.application.name}-flow-rules
+            data-type: json
+            group-id: ${spring.application.name}
+            rule-type: flow
+            namespace: sentinel
+            username: nacos
+            password: nacos
+management:
+  server:
+    port: 10101
+  endpoints:
+    web:
+      base-path: /management
+      path-mapping:
+        health: checkAlive
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      env: ${spring.profiles.active:dev}
+logging:
+  level:
+    root: INFO
