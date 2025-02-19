@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "spring.cloud.sentinel.datasource.nacos.data-id",
+      "type": "java.lang.String",
+      "description": "Description for spring.cloud.sentinel.datasource.nacos.data-id."
+    },
+    {
+      "name": "spring.cloud.sentinel.datasource.nacos.group-id",
+      "type": "java.lang.String",
+      "description": "Description for spring.cloud.sentinel.datasource.nacos.group-id."
+    },
+    {
+      "name": "spring.cloud.sentinel.datasource.nacos.password",
+      "type": "java.lang.String",
+      "description": "Description for spring.cloud.sentinel.datasource.nacos.password."
+    },
+    {
+      "name": "spring.cloud.sentinel.datasource.nacos.username",
+      "type": "java.lang.String",
+      "description": "Description for spring.cloud.sentinel.datasource.nacos.username."
+    },
+    {
+      "name": "spring.cloud.sentinel.datasource.nacos.namespace",
+      "type": "java.lang.String",
+      "description": "Description for spring.cloud.sentinel.datasource.nacos.namespace."
+    },
+    {
+      "name": "spring.cloud.sentinel.datasource.nacos.rule-type",
+      "type": "java.lang.String",
+      "description": "Description for spring.cloud.sentinel.datasource.nacos.rule-type."
+    },
+    {
+      "name": "spring.cloud.sentinel.datasource.type",
+      "type": "java.lang.String",
+      "description": "Description for spring.cloud.sentinel.datasource.type."
+    }
+  ]
+}

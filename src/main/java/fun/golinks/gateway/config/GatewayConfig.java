@@ -1,4 +1,4 @@
-package fun.golinks.gateway.config.config;
+package fun.golinks.gateway.config;
 
 import org.springframework.context.annotation.Configuration;
 
