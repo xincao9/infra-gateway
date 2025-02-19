@@ -13,10 +13,12 @@ spring:
           lower-case-service-id: true
           enabled: true
       routes:
-        - id: management_route
-          uri: http://127.0.0.1:10101/
+        - id: sample
+          uri: lb://sample
           predicates:
-            - Path=/management/**
+            - Path=/sample/**
+          filter:
+            - StripPrefix=1
 management:
   endpoints:
     web:
