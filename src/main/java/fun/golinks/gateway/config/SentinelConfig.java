@@ -6,7 +6,6 @@ import com.alibaba.csp.sentinel.datasource.ReadableDataSource;
 import com.alibaba.csp.sentinel.datasource.nacos.NacosDataSource;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import fun.golinks.gateway.properties.NacosConfig;
@@ -32,12 +31,15 @@ import java.util.Properties;
 @ImportAutoConfiguration(SentinelConfig.NacosConfiguration.class)
 public class SentinelConfig {
 
+    private static final String DATA_TYPE = "data-type";
+    private static final String RULE_TYPE = "rule-type";
+    private static final String JSON = "json";
+    private static final String FLOW = "flow";
     private final List<ViewResolver> viewResolvers;
     private final ServerCodecConfigurer serverCodecConfigurer;
 
-
     public SentinelConfig(ObjectProvider<List<ViewResolver>> viewResolversProvider,
-                          ServerCodecConfigurer serverCodecConfigurer) {
+            ServerCodecConfigurer serverCodecConfigurer) {
         this.viewResolvers = viewResolversProvider.getIfAvailable(Collections::emptyList);
         this.serverCodecConfigurer = serverCodecConfigurer;
     }
@@ -65,8 +67,11 @@ public class SentinelConfig {
             properties.put(PropertyKeyConst.USERNAME, nacosConfig.getUsername());
             properties.put(PropertyKeyConst.PASSWORD, nacosConfig.getPassword());
             properties.put(PropertyKeyConst.NAMESPACE, nacosConfig.getNamespace());
-            ReadableDataSource<String, List<FlowRule>> flowRuleDataSource = new NacosDataSource<>(properties, nacosConfig.getGroupId(), nacosConfig.getDataId(),
-                    source -> JSON.parseObject(source, new TypeReference<List<FlowRule>>() {
+            properties.put(DATA_TYPE, JSON);
+            properties.put(RULE_TYPE, FLOW);
+            ReadableDataSource<String, List<FlowRule>> flowRuleDataSource = new NacosDataSource<>(properties,
+                    nacosConfig.getGroupId(), nacosConfig.getDataId(),
+                    source -> com.alibaba.fastjson.JSON.parseObject(source, new TypeReference<List<FlowRule>>() {
                     }));
             FlowRuleManager.register2Property(flowRuleDataSource.getProperty());
         }
