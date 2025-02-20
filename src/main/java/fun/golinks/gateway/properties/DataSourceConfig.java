@@ -6,7 +6,7 @@ import lombok.Data;
  * 数据源
  */
 @Data
-public class DataSource {
+public class DataSourceConfig {
 
     /**
      * 类型

@@ -34,6 +34,11 @@
       "name": "spring.cloud.sentinel.datasource.type",
       "type": "java.lang.String",
       "description": "Description for spring.cloud.sentinel.datasource.type."
+    },
+    {
+      "name": "spring.cloud.sentinel.datasource.nacos.address",
+      "type": "java.lang.String",
+      "description": "Description for spring.cloud.sentinel.datasource.nacos.address."
     }
   ]
 }

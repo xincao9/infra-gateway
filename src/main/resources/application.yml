@@ -12,11 +12,12 @@ spring:
       datasource:
         type: nacos
         nacos:
-          data-id: ${spring.application.name}-flow-rules
-          group-id: ${spring.application.name}
-          namespace: sentinel
+          address: localhost:8848
           username: nacos
           password: nacos
+          namespace: sentinel
+          data-id: ${spring.application.name}-flow-rules
+          group-id: ${spring.application.name}
     gateway:
       discovery:
         locator:
