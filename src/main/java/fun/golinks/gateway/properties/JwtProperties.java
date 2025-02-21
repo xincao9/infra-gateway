@@ -2,12 +2,13 @@ package fun.golinks.gateway.properties;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -19,25 +20,26 @@ import java.util.concurrent.TimeUnit;
 public class JwtProperties {
 
     private String secretKey = "this-is-a-very-long-secret-key-for-hs512-algorithm-to-ensure-64-bytes-length12345"; // 至少 256 位密钥
-    private SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
+    private byte[] keyBytes = Arrays.copyOf(secretKey.getBytes(), 32);
+
+    private SecretKey key = new SecretKeySpec(keyBytes, "AES");
 
     public void setSecretKey(String secretKey) {
+        if (secretKey.getBytes().length < 32) {
+            log.error("Secret key is too short, it must be at least 32 bytes long");
+            return;
+        }
         this.secretKey = secretKey;
-        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.keyBytes = Arrays.copyOf(secretKey.getBytes(), 32);
+        this.key = new SecretKeySpec(keyBytes, "AES");
     }
 
-
     public Claims parseToken(String token) {
-        log.info("Secret key length: {} bytes", secretKey.getBytes().length);
-        if (secretKey.getBytes().length < 64) {
-            log.error("Secret key is too short for HS512, required: 64 bytes, actual: {} bytes", secretKey.getBytes().length);
-        }
         try {
             return Jwts.parser()
-//                    .decryptWith(key)
-                    .setSigningKey(key)
+                    .decryptWith(key)
                     .build()
-                    .parseSignedClaims(token)
+                    .parseEncryptedClaims(token)
                     .getPayload();
         } catch (Throwable e) {
             log.error("Invalid JWT token", e);
@@ -59,7 +61,8 @@ public class JwtProperties {
                 .subject(subject)              // 设置 subject（如用户 ID）
                 .issuedAt(now)                 // 签发时间
                 .expiration(expiryDate)        // 过期时间
-                .signWith(key).compact();      // 使用 HS512 签名
+                .encryptWith(key, Jwts.ENC.A256GCM)  // 使用 AES-256-GCM 加密
+                .compact();
     }
 
     public static void main(String... args) {
