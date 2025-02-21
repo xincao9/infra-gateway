@@ -16,7 +16,7 @@ spring:
           username: nacos
           password: nacos
           namespace: sentinel
-          data-id: ${spring.application.name}-gateway-flow-rules
+          data-id: ${spring.application.name}-flow-rules
           group-id: ${spring.application.name}
     gateway:
       discovery:
@@ -24,7 +24,7 @@ spring:
           lower-case-service-id: true
           enabled: true
       routes:
-        - id: sample
+        - id: sample_route
           uri: lb://sample
           predicates:
             - Path=/sample/**

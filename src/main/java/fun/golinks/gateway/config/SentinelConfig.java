@@ -1,5 +1,9 @@
 package fun.golinks.gateway.config;
 
+import com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiDefinition;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPathPredicateItem;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.GatewayApiDefinitionManager;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.SentinelGatewayFilter;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.exception.SentinelGatewayBlockExceptionHandler;
 import com.alibaba.csp.sentinel.datasource.ReadableDataSource;
@@ -11,6 +15,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import fun.golinks.gateway.properties.NacosProperties;
 import fun.golinks.gateway.properties.SentinelProperties;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,14 +28,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 @EnableConfigurationProperties(SentinelProperties.class)
 @Configuration
 @ImportAutoConfiguration(SentinelConfig.NacosConfiguration.class)
-public class SentinelConfig {
+public class SentinelConfig implements InitializingBean {
 
     private static final String DATA_TYPE = "data-type";
     private static final String RULE_TYPE = "rule-type";
@@ -40,7 +43,7 @@ public class SentinelConfig {
     private final ServerCodecConfigurer serverCodecConfigurer;
 
     public SentinelConfig(ObjectProvider<List<ViewResolver>> viewResolversProvider,
-            ServerCodecConfigurer serverCodecConfigurer) {
+                          ServerCodecConfigurer serverCodecConfigurer) {
         this.viewResolvers = viewResolversProvider.getIfAvailable(Collections::emptyList);
         this.serverCodecConfigurer = serverCodecConfigurer;
     }
@@ -56,6 +59,25 @@ public class SentinelConfig {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public GlobalFilter sentinelGatewayFilter() {
         return new SentinelGatewayFilter();
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        /*
+         初始化自定义的API分组
+         */
+        try {
+            Set<ApiDefinition> definitions = Collections.synchronizedSet(new HashSet<>());
+            ApiDefinition sampleApi = new ApiDefinition("sample_api")
+                    .setPredicateItems(Collections.singleton(new ApiPathPredicateItem()
+                            .setPattern("/sample/**")
+                            .setMatchStrategy(SentinelGatewayConstants.URL_MATCH_STRATEGY_PREFIX)));
+            definitions.add(sampleApi);
+            GatewayApiDefinitionManager.loadApiDefinitions(definitions);
+        } catch (Exception e) {
+            // 处理异常，例如记录日志或抛出运行时异常
+            throw new RuntimeException("Failed to load API definitions", e);
+        }
     }
 
     @ConditionalOnProperty(prefix = "spring.cloud.sentinel.datasource", name = "type", havingValue = "nacos")
