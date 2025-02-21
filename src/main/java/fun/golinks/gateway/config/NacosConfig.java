@@ -35,7 +35,7 @@ public class NacosConfig implements InitializingBean {
     private final ExecutorService refreshRoutesEventExecutorService = Executors.newSingleThreadExecutor();
 
     public NacosConfig(RouteDefinitionWriter routeDefinitionWriter, ApplicationEventPublisher applicationEventPublisher,
-                       NacosConfigManager nacosConfigManager) {
+            NacosConfigManager nacosConfigManager) {
         this.routeDefinitionWriter = routeDefinitionWriter;
         this.applicationEventPublisher = applicationEventPublisher;
         this.nacosConfigManager = nacosConfigManager;

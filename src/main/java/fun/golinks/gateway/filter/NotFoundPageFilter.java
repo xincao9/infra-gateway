@@ -1,6 +1,6 @@
 package fun.golinks.gateway.filter;
 
-import com.alibaba.fastjson.JSON;
+import fun.golinks.gateway.util.JsonUtil;
 import fun.golinks.gateway.util.WebUtils;
 import fun.golinks.gateway.vo.ErrorResult;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,8 @@ public class NotFoundPageFilter implements GlobalFilter, Ordered {
                     response.setStatusCode(HttpStatus.NOT_FOUND);
                     response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                     ErrorResult errorResult = new ErrorResult(HttpStatus.NOT_FOUND.value(), NOT_FOUND_MESSAGE);
-                    return response.writeWith(Mono.just(response.bufferFactory().wrap(JSON.toJSONBytes(errorResult))));
+                    return response.writeWith(
+                            Mono.just(response.bufferFactory().wrap(JsonUtil.toJson(errorResult).getBytes())));
                 }
             }
             return Mono.empty();

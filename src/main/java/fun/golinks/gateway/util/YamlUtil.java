@@ -43,7 +43,8 @@ public class YamlUtil {
     public static <T> List<T> toArray(String content, Class<T> clazz) {
         try {
             ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-            return objectMapper.readValue(content, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+            return objectMapper.readValue(content,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
         } catch (JsonProcessingException e) {
             log.error("", e);
             return null;
