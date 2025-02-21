@@ -44,8 +44,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         // 将用户信息添加到请求头，传递给下游
         log.info("JWT validated successfully for user: {}", claims.getSubject());
         ServerWebExchange modifiedExchange = exchange.mutate()
-                .request(exchange.getRequest().mutate()
-                        .header("X-User-Id", claims.getSubject()) // 假设 subject 是用户 ID
+                .request(exchange.getRequest().mutate().header("X-User-Id", claims.getSubject()) // 假设 subject 是用户 ID
                         .header("X-Roles", claims.get("roles", String.class)) // 假设 roles 在 JWT 中
                         .build())
                 .build();
@@ -56,8 +55,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
         ErrorResult errorResult = new ErrorResult(HttpStatus.UNAUTHORIZED.value(), "Invalid JWT token");
-        DataBuffer buffer = exchange.getResponse().bufferFactory()
-                .wrap(JSON.toJSONBytes(errorResult));
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(JSON.toJSONBytes(errorResult));
         return exchange.getResponse().writeWith(Mono.just(buffer));
     }
 

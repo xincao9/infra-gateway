@@ -9,17 +9,15 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
 
-    private String secretKey = "this-is-a-very-long-secret-key-for-hs512-algorithm-to-ensure-64-bytes-length12345"; // 至少 256 位密钥
+    private String secretKey = "Secret key is too short, it must be at least 32 bytes long";
     private byte[] keyBytes = Arrays.copyOf(secretKey.getBytes(), 32);
 
     private SecretKey key = new SecretKeySpec(keyBytes, "AES");
@@ -36,11 +34,7 @@ public class JwtProperties {
 
     public Claims parseToken(String token) {
         try {
-            return Jwts.parser()
-                    .decryptWith(key)
-                    .build()
-                    .parseEncryptedClaims(token)
-                    .getPayload();
+            return Jwts.parser().decryptWith(key).build().parseEncryptedClaims(token).getPayload();
         } catch (Throwable e) {
             log.error("Invalid JWT token", e);
             return null;
@@ -56,20 +50,10 @@ public class JwtProperties {
         Date now = new Date(nowMillis);
         // 过期时间
         Date expiryDate = new Date(nowMillis + expirationMillis);
-        return Jwts.builder()
-                .claims(claims)
-                .subject(subject)              // 设置 subject（如用户 ID）
-                .issuedAt(now)                 // 签发时间
-                .expiration(expiryDate)        // 过期时间
-                .encryptWith(key, Jwts.ENC.A256GCM)  // 使用 AES-256-GCM 加密
+        return Jwts.builder().claims(claims).subject(subject) // 设置 subject（如用户 ID）
+                .issuedAt(now) // 签发时间
+                .expiration(expiryDate) // 过期时间
+                .encryptWith(key, Jwts.ENC.A256GCM) // 使用 AES-256-GCM 加密
                 .compact();
     }
-
-    public static void main(String... args) {
-        JwtProperties jwtProperties = new JwtProperties();
-        String token = jwtProperties.generatorToken("xincao", Collections.singletonMap("roles", "admin"), TimeUnit.DAYS.toMillis(1));
-        System.out.println(token);
-        System.out.println(jwtProperties.parseToken(token));
-    }
-
 }

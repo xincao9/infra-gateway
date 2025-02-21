@@ -43,7 +43,7 @@ public class SentinelConfig implements InitializingBean {
     private final ServerCodecConfigurer serverCodecConfigurer;
 
     public SentinelConfig(ObjectProvider<List<ViewResolver>> viewResolversProvider,
-                          ServerCodecConfigurer serverCodecConfigurer) {
+            ServerCodecConfigurer serverCodecConfigurer) {
         this.viewResolvers = viewResolversProvider.getIfAvailable(Collections::emptyList);
         this.serverCodecConfigurer = serverCodecConfigurer;
     }
