@@ -1,8 +1,4 @@
-server:
-  port: 10100
 spring:
-  application:
-    name: infra-gateway
   cloud:
     nacos:
       discovery:
