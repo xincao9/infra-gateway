@@ -1,8 +1,6 @@
 server:
   port: 10100
 spring:
-  config:
-    import: nacos:gateway-routes.yaml
   application:
     name: infra-gateway
   cloud:
