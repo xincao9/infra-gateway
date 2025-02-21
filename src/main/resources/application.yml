@@ -24,7 +24,7 @@ spring:
           lower-case-service-id: true
           enabled: true
       routes:
-        - id: sample_route
+        - id: sample-route
           uri: lb://sample
           predicates:
             - Path=/sample/**

@@ -7,7 +7,7 @@
 ```json
 [
     {
-        "resource": "sample_route",
+        "resource": "sample-route",
         "resourceMode": 0,
         "grade": 1,
         "count": 5,
@@ -16,7 +16,7 @@
         "burst": 0
     },
     {
-        "resource": "sample_api",
+        "resource": "sample-api",
         "resourceMode": 1,
         "grade": 1,
         "count": 10,

@@ -68,7 +68,7 @@ public class SentinelConfig implements InitializingBean {
          */
         try {
             Set<ApiDefinition> definitions = Collections.synchronizedSet(new HashSet<>());
-            ApiDefinition sampleApi = new ApiDefinition("sample_api")
+            ApiDefinition sampleApi = new ApiDefinition("sample-api")
                     .setPredicateItems(Collections.singleton(new ApiPathPredicateItem()
                             .setPattern("/sample/**")
                             .setMatchStrategy(SentinelGatewayConstants.URL_MATCH_STRATEGY_PREFIX)));
