@@ -31,9 +31,8 @@ public class NacosConfig implements InitializingBean {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final NacosConfigManager nacosConfigManager;
 
-    public NacosConfig(RouteDefinitionWriter routeDefinitionWriter,
-                       ApplicationEventPublisher applicationEventPublisher,
-                       NacosConfigManager nacosConfigManager) {
+    public NacosConfig(RouteDefinitionWriter routeDefinitionWriter, ApplicationEventPublisher applicationEventPublisher,
+            NacosConfigManager nacosConfigManager) {
         this.routeDefinitionWriter = routeDefinitionWriter;
         this.applicationEventPublisher = applicationEventPublisher;
         this.nacosConfigManager = nacosConfigManager;
@@ -51,26 +50,18 @@ public class NacosConfig implements InitializingBean {
                 RouteDefinitionLocator routeDefinitionLocator = (RouteDefinitionLocator) routeDefinitionWriter;
                 routeDefinitionLocator.getRouteDefinitions()
                         .flatMap(routeDefinition -> routeDefinitionWriter.delete(Mono.just(routeDefinition.getId())))
-                        .thenMany(Flux.fromIterable(routes).flatMap(route -> routeDefinitionWriter.save(Mono.just(route))))
-                        .subscribe(
-                                null,
-                                error -> log.error("Failed to update routes", error),
-                                () -> {
-                                    applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
-                                    log.info("Routes updated successfully.");
-                                }
-                        );
+                        .thenMany(Flux.fromIterable(routes)
+                                .flatMap(route -> routeDefinitionWriter.save(Mono.just(route))))
+                        .subscribe(null, error -> log.error("Failed to update routes", error), () -> {
+                            applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
+                            log.info("Routes updated successfully.");
+                        });
             } else {
-                Flux.fromIterable(routes)
-                        .flatMap(route -> routeDefinitionWriter.save(Mono.just(route)))
-                        .subscribe(
-                                null,
-                                error -> log.error("Failed to add new routes", error),
-                                () -> {
-                                    applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
-                                    log.info("New routes added successfully.");
-                                }
-                        );
+                Flux.fromIterable(routes).flatMap(route -> routeDefinitionWriter.save(Mono.just(route))).subscribe(null,
+                        error -> log.error("Failed to add new routes", error), () -> {
+                            applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
+                            log.info("New routes added successfully.");
+                        });
             }
         } catch (Exception e) {
             log.error("Failed to update routes from Nacos", e);

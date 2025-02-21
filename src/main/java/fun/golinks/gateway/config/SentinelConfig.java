@@ -45,7 +45,7 @@ public class SentinelConfig implements InitializingBean {
     private final ServerCodecConfigurer serverCodecConfigurer;
 
     public SentinelConfig(ObjectProvider<List<ViewResolver>> viewResolversProvider,
-                          ServerCodecConfigurer serverCodecConfigurer) {
+            ServerCodecConfigurer serverCodecConfigurer) {
         this.viewResolvers = viewResolversProvider.getIfAvailable(Collections::emptyList);
         this.serverCodecConfigurer = serverCodecConfigurer;
     }
@@ -73,13 +73,12 @@ public class SentinelConfig implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         /*
-         初始化自定义的API分组
+         * 初始化自定义的API分组
          */
         try {
             Set<ApiDefinition> definitions = Collections.synchronizedSet(new HashSet<>());
             ApiDefinition sampleApi = new ApiDefinition("sample-api")
-                    .setPredicateItems(Collections.singleton(new ApiPathPredicateItem()
-                            .setPattern("/sample/**")
+                    .setPredicateItems(Collections.singleton(new ApiPathPredicateItem().setPattern("/sample/**")
                             .setMatchStrategy(SentinelGatewayConstants.URL_MATCH_STRATEGY_PREFIX)));
             definitions.add(sampleApi);
             GatewayApiDefinitionManager.loadApiDefinitions(definitions);
