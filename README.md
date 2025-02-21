@@ -6,26 +6,27 @@
 
 ```json
 [
-    {
-        "resource": "sample-route",
-        "resourceMode": 0,
-        "grade": 1,
-        "count": 5,
-        "intervalSec": 1,
-        "controlBehavior": 0,
-        "burst": 0
-    },
-    {
-        "resource": "sample-api",
-        "resourceMode": 1,
-        "grade": 1,
-        "count": 10,
-        "intervalSec": 1,
-        "controlBehavior": 0,
-        "burst": 0
-    }
+  {
+    "resource": "sample-route",
+    "resourceMode": 0,
+    "grade": 1,
+    "count": 5,
+    "intervalSec": 1,
+    "controlBehavior": 0,
+    "burst": 0
+  },
+  {
+    "resource": "sample-api",
+    "resourceMode": 1,
+    "grade": 1,
+    "count": 10,
+    "intervalSec": 1,
+    "controlBehavior": 0,
+    "burst": 0
+  }
 ]
 ```
+
 * nacos配置位置namespace:sentinel；data-id: infra-gateway-flow-rules；group-id: infra-gateway
 * resource：限流资源，可以是路由 ID（如 test_route）或自定义 API（如 test_api）。
 * resourceMode：0 表示路由限流，1 表示自定义 API 限流。

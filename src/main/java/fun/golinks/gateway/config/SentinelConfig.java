@@ -5,6 +5,7 @@ import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiDefinition;
 import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPathPredicateItem;
 import com.alibaba.csp.sentinel.adapter.gateway.common.api.GatewayApiDefinitionManager;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.SentinelGatewayFilter;
+import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.GatewayCallbackManager;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.exception.SentinelGatewayBlockExceptionHandler;
 import com.alibaba.csp.sentinel.datasource.ReadableDataSource;
 import com.alibaba.csp.sentinel.datasource.nacos.NacosDataSource;
@@ -15,6 +16,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import fun.golinks.gateway.properties.NacosProperties;
 import fun.golinks.gateway.properties.SentinelProperties;
+import fun.golinks.gateway.sentinel.GatewayBlockRequestHandler;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -59,6 +61,13 @@ public class SentinelConfig implements InitializingBean {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public GlobalFilter sentinelGatewayFilter() {
         return new SentinelGatewayFilter();
+    }
+
+    @Bean
+    public GatewayBlockRequestHandler gatewayBlockRequestHandler() {
+        GatewayBlockRequestHandler gatewayBlockRequestHandler = new GatewayBlockRequestHandler();
+        GatewayCallbackManager.setBlockHandler(gatewayBlockRequestHandler);
+        return gatewayBlockRequestHandler;
     }
 
     @Override
