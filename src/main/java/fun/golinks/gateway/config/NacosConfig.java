@@ -31,6 +31,7 @@ public class NacosConfig implements InitializingBean {
     private final RouteDefinitionWriter routeDefinitionWriter;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final NacosConfigManager nacosConfigManager;
+    private final ExecutorService refreshRoutesEventExecutorService = Executors.newSingleThreadExecutor();
 
     public NacosConfig(RouteDefinitionWriter routeDefinitionWriter, ApplicationEventPublisher applicationEventPublisher,
             NacosConfigManager nacosConfigManager) {
@@ -78,8 +79,6 @@ public class NacosConfig implements InitializingBean {
             log.error("Failed to update routes from Nacos", e);
         }
     }
-
-    private final ExecutorService refreshRoutesEventExecutorService = Executors.newSingleThreadExecutor();
 
     @Override
     public void afterPropertiesSet() throws Exception {
