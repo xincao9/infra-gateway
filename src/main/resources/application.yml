@@ -1,6 +1,8 @@
 server:
   port: 10100
 spring:
+  config:
+    import: nacos:gateway-routes.yaml
   application:
     name: infra-gateway
   cloud:
@@ -10,13 +12,6 @@ spring:
         username: nacos
         password: nacos
         namespace: api
-#      config:
-#        server-addr: 127.0.0.1:8848
-#        username: nacos
-#        password: nacos
-#        namespace: api
-#        file-extension: yaml
-#        group: DEFAULT_GROUP
     sentinel:
       datasource:
         type: nacos
@@ -62,6 +57,7 @@ management:
     port: 10101
 logging:
   level:
-    root: DEBUG
-    org.springframework.boot: DEBUG
-    org.springframework.cloud: DEBUG
+    root: INFO
+    org.springframework: DEBUG # Spring 框架日志
+    org.springframework.cloud: DEBUG # Spring Cloud 日志
+    com.alibaba.cloud: DEBUG   # Spring Cloud Alibaba 日志

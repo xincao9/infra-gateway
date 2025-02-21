@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Slf4j
@@ -53,14 +54,24 @@ public class NacosConfig implements InitializingBean {
                         .thenMany(Flux.fromIterable(routes)
                                 .flatMap(route -> routeDefinitionWriter.save(Mono.just(route))))
                         .subscribe(null, error -> log.error("Failed to update routes", error), () -> {
-                            applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
-                            log.info("Routes updated successfully.");
+                            refreshRoutesEventExecutorService.submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
+                                    log.info("Routes updated successfully.");
+                                }
+                            });
                         });
             } else {
                 Flux.fromIterable(routes).flatMap(route -> routeDefinitionWriter.save(Mono.just(route))).subscribe(null,
                         error -> log.error("Failed to add new routes", error), () -> {
-                            applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
-                            log.info("New routes added successfully.");
+                            refreshRoutesEventExecutorService.submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
+                                    log.info("New routes added successfully.");
+                                }
+                            });
                         });
             }
         } catch (Exception e) {
@@ -68,10 +79,12 @@ public class NacosConfig implements InitializingBean {
         }
     }
 
+    private final ExecutorService refreshRoutesEventExecutorService = Executors.newSingleThreadExecutor();
+
     @Override
     public void afterPropertiesSet() throws Exception {
         // 初始化时加载路由
-        updateRoutes();
+        Executors.newSingleThreadExecutor().submit(this::updateRoutes);
 
         // 监听 Nacos 配置变化
         nacosConfigManager.getConfigService().addListener(DATA_ID, GROUP, new Listener() {
