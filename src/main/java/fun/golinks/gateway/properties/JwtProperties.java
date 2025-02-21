@@ -8,6 +8,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -44,24 +48,22 @@ public class JwtProperties {
         return parseToken(token) == null;
     }
 
-    /**
-     * 生成一个紧凑的JWT（JSON Web Token）字符串。
-     * <p>
-     * 该函数使用提供的主题（subject）和角色（roles）信息构建一个JWT，并使用预定义的密钥进行签名。
-     * 最终返回一个紧凑的、经过签名的JWT字符串。
-     *
-     * @param subject JWT的主题，通常表示用户或实体的唯一标识。
-     * @param roles   JWT中包含的角色信息，通常用于权限控制。
-     * @return 返回一个紧凑的、经过签名的JWT字符串。
-     */
-    public String generatorToken(String subject, String roles) {
-        // 使用Jwts.builder()构建JWT，设置主题和角色信息，并使用密钥进行签名，最后生成紧凑的JWT字符串。
-        return Jwts.builder().subject(subject).claim("roles", roles).signWith(key).compact();
+    public String generatorToken(String subject, Map<String, Object> claims, long expirationMillis) {
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+        // 过期时间
+        Date expiryDate = new Date(nowMillis + expirationMillis);
+        return Jwts.builder()
+                .claims(claims)
+                .subject(subject)              // 设置 subject（如用户 ID）
+                .issuedAt(now)                 // 签发时间
+                .expiration(expiryDate)        // 过期时间
+                .signWith(key).compact();      // 使用 HS512 签名
     }
 
     public static void main(String... args) {
         JwtProperties jwtProperties = new JwtProperties();
-        String token = jwtProperties.generatorToken("xincao", "admin");
+        String token = jwtProperties.generatorToken("xincao", Collections.singletonMap("roles", "admin"), TimeUnit.DAYS.toMillis(1));
         System.out.println(token);
         System.out.println(jwtProperties.parseToken(token));
     }
