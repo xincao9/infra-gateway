@@ -1,4 +1,4 @@
-package fun.golinks.gateway.sentinel;
+package fun.golinks.gateway.filter;
 
 import com.alibaba.fastjson.JSON;
 import fun.golinks.gateway.util.WebUtils;

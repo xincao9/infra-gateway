@@ -21,7 +21,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +31,6 @@ import org.springframework.web.reactive.result.view.ViewResolver;
 
 import java.util.*;
 
-@EnableConfigurationProperties(SentinelProperties.class)
 @Configuration
 @ImportAutoConfiguration(SentinelConfig.NacosConfiguration.class)
 public class SentinelConfig implements InitializingBean {
@@ -45,7 +43,7 @@ public class SentinelConfig implements InitializingBean {
     private final ServerCodecConfigurer serverCodecConfigurer;
 
     public SentinelConfig(ObjectProvider<List<ViewResolver>> viewResolversProvider,
-            ServerCodecConfigurer serverCodecConfigurer) {
+                          ServerCodecConfigurer serverCodecConfigurer) {
         this.viewResolvers = viewResolversProvider.getIfAvailable(Collections::emptyList);
         this.serverCodecConfigurer = serverCodecConfigurer;
     }

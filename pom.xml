@@ -15,6 +15,7 @@
         <spring-cloud-alibaba.version>2021.0.5.0</spring-cloud-alibaba.version>
         <nacos-client-version>2.2.3</nacos-client-version>
         <netty-version>4.1.85.Final</netty-version>
+        <jjwt.version>0.12.6</jjwt.version>
     </properties>
     <dependencies>
         <dependency>
@@ -68,6 +69,25 @@
             <artifactId>netty-resolver-dns-native-macos</artifactId>
             <version>${netty-version}</version>
             <classifier>${os.detected.classifier}</classifier>
+        </dependency>
+        <!-- JWT 处理 -->
+        <!-- JWT API -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <!-- JWT 实现 -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <!-- JSON 解析（推荐 Jackson） -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
