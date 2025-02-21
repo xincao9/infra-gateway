@@ -18,9 +18,16 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
+/**
+ * <pre>
+ *     curl -X GET -H 'Authorization:Bearer eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..ERG6yVlTSS3pnLdS.1nDMIk3BxPcBJOZOpdgNAz12d7RBdb0rj4_NXeV7svK2Spar66DoOPQieCyY9nFQEPRCCaHohcxWzePCm9SdTnDc.jXdHINr-Lb-T5hB5aWH86w' 'http://localhost:10100/sample/github/contributors'
+ * </pre>
+ */
 @Slf4j
 @Component
+@SuppressWarnings("all")
 public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     @Resource
@@ -42,10 +49,13 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             return unauthorizedResponse(exchange);
         }
         // 将用户信息添加到请求头，传递给下游
-        log.info("JWT validated successfully for user: {}", claims.getSubject());
         ServerWebExchange modifiedExchange = exchange.mutate()
-                .request(exchange.getRequest().mutate().header("X-User-Id", claims.getSubject()) // 假设 subject 是用户 ID
-                        .header("X-Roles", claims.get("roles", String.class)) // 假设 roles 在 JWT 中
+                .request(exchange.getRequest().mutate()
+                        .headers(httpHeaders -> {
+                            for (Map.Entry<String, Object> entry : claims.entrySet()) {
+                                httpHeaders.add(entry.getKey(), String.valueOf(entry.getValue()));
+                            }
+                        })
                         .build())
                 .build();
         return chain.filter(modifiedExchange);
