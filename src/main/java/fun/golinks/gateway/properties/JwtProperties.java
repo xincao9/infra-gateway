@@ -34,7 +34,8 @@ public class JwtProperties {
         }
         try {
             return Jwts.parser()
-                    .decryptWith(key)
+//                    .decryptWith(key)
+                    .setSigningKey(key)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
