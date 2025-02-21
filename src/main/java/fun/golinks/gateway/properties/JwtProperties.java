@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@ConfigurationProperties(prefix = "jwt")
+@ConfigurationProperties(prefix = "spring.cloud.jwt")
 public class JwtProperties {
 
     private String secretKey = "Secret key is too short, it must be at least 32 bytes long";
