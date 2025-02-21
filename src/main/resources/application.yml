@@ -56,6 +56,6 @@ management:
 logging:
   level:
     root: INFO
-    org.springframework: DEBUG # Spring 框架日志
-    org.springframework.cloud: DEBUG # Spring Cloud 日志
-    com.alibaba.cloud: DEBUG   # Spring Cloud Alibaba 日志
+#    org.springframework: DEBUG # Spring 框架日志
+#    org.springframework.cloud: DEBUG # Spring Cloud 日志
+#    com.alibaba.cloud: DEBUG   # Spring Cloud Alibaba 日志

@@ -21,7 +21,6 @@ public class GatewayBlockRequestHandler implements BlockRequestHandler {
 
     @Override
     public Mono<ServerResponse> handleRequest(ServerWebExchange exchange, Throwable ex) {
-        log.info("Blocked by Gateway: ", ex);
         if (acceptsHtml(exchange)) {
             return htmlErrorResponse();
         }

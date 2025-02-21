@@ -84,7 +84,7 @@ public class NacosConfig implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         // 初始化时加载路由
-        Executors.newSingleThreadExecutor().submit(this::updateRoutes);
+        updateRoutes();
 
         // 监听 Nacos 配置变化
         nacosConfigManager.getConfigService().addListener(DATA_ID, GROUP, new Listener() {
