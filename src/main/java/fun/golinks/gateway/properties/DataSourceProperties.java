@@ -6,7 +6,7 @@ import lombok.Data;
  * 数据源
  */
 @Data
-public class DataSourceConfig {
+public class DataSourceProperties {
 
     /**
      * 类型
@@ -16,5 +16,5 @@ public class DataSourceConfig {
     /**
      * nacos配置
      */
-    private NacosConfig nacos = new NacosConfig();
+    private NacosProperties nacos = new NacosProperties();
 }

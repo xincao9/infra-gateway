@@ -6,9 +6,10 @@ import com.alibaba.csp.sentinel.datasource.ReadableDataSource;
 import com.alibaba.csp.sentinel.datasource.nacos.NacosDataSource;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.nacos.api.PropertyKeyConst;
-import fun.golinks.gateway.properties.NacosConfig;
+import fun.golinks.gateway.properties.NacosProperties;
 import fun.golinks.gateway.properties.SentinelProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -33,8 +34,8 @@ public class SentinelConfig {
 
     private static final String DATA_TYPE = "data-type";
     private static final String RULE_TYPE = "rule-type";
-    private static final String JSON = "json";
-    private static final String FLOW = "flow";
+    private static final String JSON_TYPE = "json";
+    private static final String FLOW_TYPE = "flow";
     private final List<ViewResolver> viewResolvers;
     private final ServerCodecConfigurer serverCodecConfigurer;
 
@@ -60,18 +61,18 @@ public class SentinelConfig {
     @ConditionalOnProperty(prefix = "spring.cloud.sentinel.datasource", name = "type", havingValue = "nacos")
     public static class NacosConfiguration {
 
-        public NacosConfiguration(SentinelProperties sentinelProperties) throws Exception {
-            NacosConfig nacosConfig = sentinelProperties.getDatasource().getNacos();
+        public NacosConfiguration(SentinelProperties sentinelProperties) {
+            NacosProperties nacosProperties = sentinelProperties.getDatasource().getNacos();
             Properties properties = new Properties();
-            properties.put(PropertyKeyConst.SERVER_ADDR, nacosConfig.getAddress());
-            properties.put(PropertyKeyConst.USERNAME, nacosConfig.getUsername());
-            properties.put(PropertyKeyConst.PASSWORD, nacosConfig.getPassword());
-            properties.put(PropertyKeyConst.NAMESPACE, nacosConfig.getNamespace());
-            properties.put(DATA_TYPE, JSON);
-            properties.put(RULE_TYPE, FLOW);
+            properties.put(PropertyKeyConst.SERVER_ADDR, nacosProperties.getAddress());
+            properties.put(PropertyKeyConst.USERNAME, nacosProperties.getUsername());
+            properties.put(PropertyKeyConst.PASSWORD, nacosProperties.getPassword());
+            properties.put(PropertyKeyConst.NAMESPACE, nacosProperties.getNamespace());
+            properties.put(DATA_TYPE, JSON_TYPE);
+            properties.put(RULE_TYPE, FLOW_TYPE);
             ReadableDataSource<String, List<FlowRule>> flowRuleDataSource = new NacosDataSource<>(properties,
-                    nacosConfig.getGroupId(), nacosConfig.getDataId(),
-                    source -> com.alibaba.fastjson.JSON.parseObject(source, new TypeReference<List<FlowRule>>() {
+                    nacosProperties.getGroupId(), nacosProperties.getDataId(),
+                    source -> JSON.parseObject(source, new TypeReference<List<FlowRule>>() {
                     }));
             FlowRuleManager.register2Property(flowRuleDataSource.getProperty());
         }

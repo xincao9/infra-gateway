@@ -13,5 +13,5 @@ public class SentinelProperties {
     /**
      * 数据源
      */
-    private DataSourceConfig datasource;
+    private DataSourceProperties datasource = new DataSourceProperties();
 }
