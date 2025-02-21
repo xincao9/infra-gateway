@@ -18,6 +18,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -34,21 +35,43 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     private JwtProperties jwtProperties;
     private static final String AUTH_HEADER = "Authorization";
 
-    @Override
+    /**
+     * 过滤器方法，用于处理请求的授权验证和用户信息传递。
+     * 该方法会检查请求头中的 Authorization 字段，验证 JWT 的有效性，
+     * 并将 JWT 中的用户信息添加到请求头中，传递给下游服务。
+     *
+     * @param exchange ServerWebExchange 对象，包含当前请求和响应的上下文信息。
+     * @param chain    GatewayFilterChain 对象，用于继续执行过滤器链中的下一个过滤器。
+     * @return Mono<Void> 表示异步处理的结果，可能包含未授权的响应或继续执行过滤器链。
+     */
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // 获取 Authorization 头
+        // 获取请求头中的 Authorization 字段
         HttpHeaders headers = exchange.getRequest().getHeaders();
         String authHeader = headers.getFirst(AUTH_HEADER);
+
+        // 如果 Authorization 头为空或不以 "Bearer " 开头，则直接继续执行过滤器链
         if (StringUtils.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
             return chain.filter(exchange);
         }
-        // 提取 JWT
-        String token = authHeader.substring(7); // 移除 "Bearer "
+
+        // 从 Authorization 头中提取 JWT 令牌
+        String token = authHeader.substring(7); // 移除 "Bearer " 前缀
+
+        // 解析 JWT 令牌并获取其中的声明信息
         Claims claims = jwtProperties.parseToken(token);
         if (claims == null) {
+            // 如果解析失败，返回未授权的响应
             return unauthorizedResponse(exchange);
         }
-        // 将用户信息添加到请求头，传递给下游
+
+        // 检查 JWT 是否已过期
+        Date expiration = claims.getExpiration();
+        if (expiration != null && new Date().after(expiration)) {
+            // 如果 JWT 已过期，返回未授权的响应
+            return unauthorizedResponse(exchange);
+        }
+
+        // 将 JWT 中的用户信息添加到请求头中，传递给下游服务
         ServerWebExchange modifiedExchange = exchange.mutate()
                 .request(exchange.getRequest().mutate()
                         .headers(httpHeaders -> {
@@ -58,8 +81,11 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                         })
                         .build())
                 .build();
+
+        // 继续执行过滤器链，传递修改后的请求
         return chain.filter(modifiedExchange);
     }
+
 
     private Mono<Void> unauthorizedResponse(ServerWebExchange exchange) {
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
