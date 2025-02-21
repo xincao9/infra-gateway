@@ -1,8 +1,9 @@
 package fun.golinks.gateway.config;
 
 import com.alibaba.cloud.nacos.NacosConfigManager;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.api.config.listener.Listener;
+import fun.golinks.gateway.util.JsonUtil;
+import fun.golinks.gateway.util.YamlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,7 +35,7 @@ public class NacosConfig implements InitializingBean {
     private final ExecutorService refreshRoutesEventExecutorService = Executors.newSingleThreadExecutor();
 
     public NacosConfig(RouteDefinitionWriter routeDefinitionWriter, ApplicationEventPublisher applicationEventPublisher,
-            NacosConfigManager nacosConfigManager) {
+                       NacosConfigManager nacosConfigManager) {
         this.routeDefinitionWriter = routeDefinitionWriter;
         this.applicationEventPublisher = applicationEventPublisher;
         this.nacosConfigManager = nacosConfigManager;
@@ -47,7 +48,15 @@ public class NacosConfig implements InitializingBean {
                 log.warn("Config from Nacos is empty, skipping route update.");
                 return;
             }
-            List<RouteDefinition> routes = JSON.parseArray(config, RouteDefinition.class);
+            List<RouteDefinition> routes = null;
+            if (JsonUtil.isJson(config)) {
+                routes = JsonUtil.toArray(config, RouteDefinition.class);
+            } else {
+                routes = YamlUtil.toArray(config, RouteDefinition.class);
+            }
+            if (routes == null) {
+                return;
+            }
             if (routeDefinitionWriter instanceof RouteDefinitionLocator) {
                 RouteDefinitionLocator routeDefinitionLocator = (RouteDefinitionLocator) routeDefinitionWriter;
                 routeDefinitionLocator.getRouteDefinitions()
