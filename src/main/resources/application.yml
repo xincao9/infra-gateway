@@ -1,4 +1,8 @@
+server:
+  port: 10100
 spring:
+  application:
+    name: infra-gateway
   cloud:
     nacos:
       discovery:
@@ -6,6 +10,13 @@ spring:
         username: nacos
         password: nacos
         namespace: api
+      config:
+        server-addr: 127.0.0.1:8848
+        username: nacos
+        password: nacos
+        namespace: api
+        file-extension: yaml
+        group: DEFAULT_GROUP
     sentinel:
       datasource:
         type: nacos
@@ -23,6 +34,8 @@ spring:
           enabled: true
       metrics:
         enabled: true # 启用 Gateway Metrics
+
+# 在 nacos 中配置路由规则，所以这里可以不用配置
 #      routes:
 #        - id: sample-route
 #          uri: lb://sample
@@ -30,6 +43,7 @@ spring:
 #            - Path=/sample/**
 #          filters:
 #            - StripPrefix=1
+
 management:
   endpoints:
     web:
@@ -49,3 +63,5 @@ management:
 logging:
   level:
     root: INFO
+    org.springframework.boot: DEBUG
+    org.springframework.cloud: DEBUG

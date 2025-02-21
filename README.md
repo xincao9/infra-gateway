@@ -1,9 +1,10 @@
 # infra-gateway
 
-基础架构-业务网关
+一个开箱即用的业务网关服务；
 
 ## 服务发现配置
 
+### application.yml
 ```yaml
 spring:
   cloud:
@@ -25,6 +26,34 @@ spring:
             - Path=/sample/**
           filters:
             - StripPrefix=1
+```
+
+### 网关路由配置 nacos namespace: api；data-id: gateway-routes.yaml； group: infra-gateway
+
+```json
+
+[
+    {
+        "id": "sample-route",
+        "uri": "lb://sample",
+        "predicates": [
+            {
+                "name": "Path",
+                "args": {
+                    "pattern": "/sample/**"
+                }
+            }
+        ],
+        "filters": [
+            {
+                "name": "StripPrefix",
+                "args": {
+                    "_genkey_0": "1"
+                }
+            }
+        ]
+    }
+]
 ```
 
 ## 限流配置
