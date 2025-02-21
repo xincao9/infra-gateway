@@ -4,6 +4,7 @@ import com.alibaba.cloud.nacos.NacosConfigManager;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.api.config.listener.Listener;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
@@ -12,11 +13,12 @@ import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
 import org.springframework.cloud.gateway.route.RouteDefinitionWriter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Configuration;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @EnableDiscoveryClient
@@ -28,6 +30,7 @@ public class NacosConfig implements InitializingBean {
     private final RouteDefinitionWriter routeDefinitionWriter;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final NacosConfigManager nacosConfigManager;
+
     public NacosConfig(RouteDefinitionWriter routeDefinitionWriter,
                        ApplicationEventPublisher applicationEventPublisher,
                        NacosConfigManager nacosConfigManager) {
@@ -39,22 +42,36 @@ public class NacosConfig implements InitializingBean {
     private void updateRoutes() {
         try {
             String config = nacosConfigManager.getConfigService().getConfig(DATA_ID, GROUP, 5000);
+            if (StringUtils.isBlank(config)) {
+                log.warn("Config from Nacos is empty, skipping route update.");
+                return;
+            }
             List<RouteDefinition> routes = JSON.parseArray(config, RouteDefinition.class);
             if (routeDefinitionWriter instanceof RouteDefinitionLocator) {
                 RouteDefinitionLocator routeDefinitionLocator = (RouteDefinitionLocator) routeDefinitionWriter;
-                routeDefinitionLocator.getRouteDefinitions().subscribe(new Consumer<RouteDefinition>() {
-                    @Override
-                    public void accept(RouteDefinition routeDefinition) {
-                        routeDefinitionWriter.delete(Mono.just(routeDefinition.getId())).subscribe();
-                    }
-                });
+                routeDefinitionLocator.getRouteDefinitions()
+                        .flatMap(routeDefinition -> routeDefinitionWriter.delete(Mono.just(routeDefinition.getId())))
+                        .thenMany(Flux.fromIterable(routes).flatMap(route -> routeDefinitionWriter.save(Mono.just(route))))
+                        .subscribe(
+                                null,
+                                error -> log.error("Failed to update routes", error),
+                                () -> {
+                                    applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
+                                    log.info("Routes updated successfully.");
+                                }
+                        );
+            } else {
+                Flux.fromIterable(routes)
+                        .flatMap(route -> routeDefinitionWriter.save(Mono.just(route)))
+                        .subscribe(
+                                null,
+                                error -> log.error("Failed to add new routes", error),
+                                () -> {
+                                    applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
+                                    log.info("New routes added successfully.");
+                                }
+                        );
             }
-            // 添加新路由
-            for (RouteDefinition route : routes) {
-                routeDefinitionWriter.save(Mono.just(route)).subscribe();
-            }
-            // 刷新路由
-            applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
         } catch (Exception e) {
             log.error("Failed to update routes from Nacos", e);
         }
@@ -64,6 +81,7 @@ public class NacosConfig implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         // 初始化时加载路由
         updateRoutes();
+
         // 监听 Nacos 配置变化
         nacosConfigManager.getConfigService().addListener(DATA_ID, GROUP, new Listener() {
             @Override
@@ -73,8 +91,10 @@ public class NacosConfig implements InitializingBean {
 
             @Override
             public Executor getExecutor() {
-                return null;
+                // 提供一个合适的 Executor，例如使用线程池
+                return Executors.newSingleThreadExecutor();
             }
         });
     }
+
 }

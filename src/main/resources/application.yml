@@ -23,13 +23,13 @@ spring:
           enabled: true
       metrics:
         enabled: true # 启用 Gateway Metrics
-      routes:
-        - id: sample-route
-          uri: lb://sample
-          predicates:
-            - Path=/sample/**
-          filters:
-            - StripPrefix=1
+#      routes:
+#        - id: sample-route
+#          uri: lb://sample
+#          predicates:
+#            - Path=/sample/**
+#          filters:
+#            - StripPrefix=1
 management:
   endpoints:
     web:
