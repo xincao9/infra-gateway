@@ -24,7 +24,7 @@ import java.time.Duration;
 @Component
 public class IpBlockingFilter implements GlobalFilter, Ordered {
 
-    private static final long MAX_REQUEST_COUNT = 5L; // 最大违规次数
+    private static final long MAX_REQUEST_COUNT = 60L; // 最大请求次数
     private static final Duration BAN_DURATION = Duration.ofMinutes(30); // 封禁时长
     private static final String FORBIDDEN_MESSAGE = "很抱歉，您暂时无法访问此页面。可能是由于身份验证失败或您的请求触发了安全限制。请检查您的登录凭证是否正确，或稍后再试。如果问题持续存在，请联系我们的支持团队获取帮助。感谢您的理解！";
     private static String FORBIDDEN_PAGE = FORBIDDEN_MESSAGE;
@@ -47,8 +47,8 @@ public class IpBlockingFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String clientIp = WebUtils.getClientIp(exchange);
         // 检查 IP 是否被封禁
-        return redisTemplate.opsForValue().get("banned:" + clientIp).flatMap(banned -> {
-            if (banned != null && banned.equals("true")) {
+        return redisTemplate.opsForValue().get("banned:" + clientIp).defaultIfEmpty("false").flatMap(banned -> {
+            if ("true".equals(banned)) {
                 return forbiddenResponse(exchange);
             }
             return increment(exchange, chain, clientIp);
@@ -69,9 +69,6 @@ public class IpBlockingFilter implements GlobalFilter, Ordered {
                 return redisTemplate.opsForValue().set("banned:" + clientIp, "true", BAN_DURATION)
                         .then(forbiddenResponse(exchange));
             }
-            return chain.filter(exchange);
-        }).onErrorResume(e -> {
-            log.error("Redis operation failed", e);
             return chain.filter(exchange);
         });
     }
