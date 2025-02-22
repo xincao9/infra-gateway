@@ -48,7 +48,7 @@ public class IpBlockingFilter implements GlobalFilter {
         // 检查 IP 是否被封禁
         return redisTemplate.opsForValue().get("banned:" + clientIp).flatMap(banned -> {
             if (banned != null && banned.equals("true")) {
-                return sendErrorResponse(exchange);
+                return forbiddenResponse(exchange);
             }
             return increment(exchange, chain, clientIp);
         });
@@ -60,14 +60,14 @@ public class IpBlockingFilter implements GlobalFilter {
             if (count >= MAX_VIOLATIONS) {
                 // 达到阈值，封禁 IP
                 return redisTemplate.opsForValue().set("banned:" + clientIp, "true", BAN_DURATION)
-                        .then(sendErrorResponse(exchange));
+                        .then(forbiddenResponse(exchange));
             }
             // 未达到阈值，返回错误但不封禁
-            return sendErrorResponse(exchange);
+            return forbiddenResponse(exchange);
         }).then(Mono.defer(() -> redisTemplate.expire(requestCounterKey, BAN_DURATION))).then(chain.filter(exchange)); // 设置过期时间
     }
 
-    private Mono<Void> sendErrorResponse(ServerWebExchange exchange) {
+    private Mono<Void> forbiddenResponse(ServerWebExchange exchange) {
         ServerHttpResponse response = exchange.getResponse();
         if (WebUtils.acceptsHtml(exchange)) {
             response.setStatusCode(HttpStatus.FORBIDDEN);

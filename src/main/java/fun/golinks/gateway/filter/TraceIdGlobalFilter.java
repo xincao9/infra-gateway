@@ -53,15 +53,12 @@ public class TraceIdGlobalFilter implements GlobalFilter, Ordered {
 
         log.info("Request received: method={}, uri={}, queryParams={}", method, uri, queryParams);
         // 继续过滤器链
-        return chain.filter(modifiedExchange).doFinally(new Consumer<SignalType>() {
-            @Override
-            public void accept(SignalType signalType) {
-                long endTime = System.currentTimeMillis();
-                long costTime = endTime - startTime; // 转换为毫秒
-                log.info("Request completed: method={}, uri={}, status={}, duration={}ms", method, uri,
-                        exchange.getResponse().getStatusCode(), costTime);
-                MDC.remove(TRACE_ID_HEADER); // 只移除 trace-id
-            }
+        return chain.filter(modifiedExchange).doFinally(signalType -> {
+            long endTime = System.currentTimeMillis();
+            long costTime = endTime - startTime; // 转换为毫秒
+            log.info("Request completed: method={}, uri={}, status={}, duration={}ms", method, uri,
+                    exchange.getResponse().getStatusCode(), costTime);
+            MDC.remove(TRACE_ID_HEADER); // 只移除 trace-id
         });
     }
 
