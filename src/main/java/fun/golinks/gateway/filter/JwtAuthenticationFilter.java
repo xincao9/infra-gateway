@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private static final String UNAUTHORIZED_MESSAGE = "Authentication Failed\nInvalid JWT Token\nPlease try logging in again or contact support if the issue persists.";
     private static final String AUTH_HEADER = "Authorization";
-    public static String UNAUTHORIZED_PAGE = "";
+    public static String UNAUTHORIZED_PAGE = UNAUTHORIZED_MESSAGE;
 
     static {
         try {

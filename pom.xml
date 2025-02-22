@@ -16,6 +16,7 @@
         <nacos-client-version>2.2.3</nacos-client-version>
         <netty-version>4.1.85.Final</netty-version>
         <jjwt.version>0.12.6</jjwt.version>
+        <redis-server.version>0.3.1</redis-server.version>
     </properties>
     <dependencies>
         <dependency>
@@ -90,6 +91,16 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>${jjwt.version}</version>
+        </dependency>
+        <!--        redis-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.microwww</groupId>
+            <artifactId>redis-server</artifactId>
+            <version>${redis-server.version}</version>
         </dependency>
         <!--        其他工具包-->
         <dependency>

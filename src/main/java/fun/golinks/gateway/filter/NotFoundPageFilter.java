@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 public class NotFoundPageFilter implements GlobalFilter, Ordered {
 
     public static final String NOT_FOUND_MESSAGE = "页面未找到\n\n抱歉，您请求的页面不存在。请检查 URL 或稍后重试。";
-    public static String NOT_FOUND_HTML = "";
+    public static String NOT_FOUND_HTML = NOT_FOUND_MESSAGE;
 
     static {
         try {

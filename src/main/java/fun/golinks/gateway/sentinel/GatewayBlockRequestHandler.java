@@ -19,7 +19,7 @@ public class GatewayBlockRequestHandler implements BlockRequestHandler {
     private static final String BLOCK_MSG = "尊敬的用户，您好！\n" + "\n"
             + "由于您的访问频率过高，已触发网站的流量限制保护。这是为了确保所有用户都能公平、稳定地使用我们的服务而设置的安全机制。请您稍作调整后重试。";
 
-    private static String BLOCK_HTML = "";
+    private static String BLOCK_HTML = BLOCK_MSG;
 
     static {
         try {
