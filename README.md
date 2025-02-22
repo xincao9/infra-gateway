@@ -51,31 +51,15 @@ spring:
 - **Namespace**: `api`
 - **Data ID**: `gateway-routes.yaml`
 - **Group**: `infra-gateway`
-- **格式**: JSON（也可使用 YAML，需调整解析逻辑）
+- **格式**: JSON OR YAML
 
-```json
-[
-  {
-    "id": "sample-route",
-    "uri": "lb://sample",
-    "predicates": [
-      {
-        "name": "Path",
-        "args": {
-          "pattern": "/sample/**"
-        }
-      }
-    ],
-    "filters": [
-      {
-        "name": "StripPrefix",
-        "args": {
-          "_genkey_0": "1"
-        }
-      }
-    ]
-  }
-]
+```yaml
+- id: sample-route
+  uri: lb://sample
+  predicates:
+  - Path=/sample/**
+  filters:
+  - StripPrefix=1
 ```
 
 ---
