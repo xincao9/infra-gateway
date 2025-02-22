@@ -119,6 +119,6 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE + 1; // 优先级最高，确保认证最先执行
+        return Ordered.HIGHEST_PRECEDENCE + 1;
     }
 }

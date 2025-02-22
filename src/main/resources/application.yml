@@ -4,11 +4,11 @@ spring:
   application:
     name: infra-gateway
   redis:
-    url: redis://:@127.0.0.1:6380 # 和 host，port, username, password配置效果一样
+    url: redis://:@127.0.0.1:6379 # 和 host，port, username, password配置效果一样
     host: localhost
     username: ''
     password: ''
-    port: 6380
+    port: 6379
   cloud:
     nacos:
       discovery:
