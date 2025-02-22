@@ -55,26 +55,26 @@ spring:
 
 ```json
 [
-    {
-        "id": "sample-route",
-        "uri": "lb://sample",
-        "predicates": [
-            {
-                "name": "Path",
-                "args": {
-                    "pattern": "/sample/**"
-                }
-            }
-        ],
-        "filters": [
-            {
-                "name": "StripPrefix",
-                "args": {
-                    "_genkey_0": "1"
-                }
-            }
-        ]
-    }
+  {
+    "id": "sample-route",
+    "uri": "lb://sample",
+    "predicates": [
+      {
+        "name": "Path",
+        "args": {
+          "pattern": "/sample/**"
+        }
+      }
+    ],
+    "filters": [
+      {
+        "name": "StripPrefix",
+        "args": {
+          "_genkey_0": "1"
+        }
+      }
+    ]
+  }
 ]
 ```
 
@@ -93,24 +93,45 @@ spring:
 
 ```json
 [
-    {
-        "resource": "sample-route",
-        "resourceMode": 0,    # 路由限流
-        "grade": 1,           # 限流基于 QPS
-        "count": 5,           # QPS 阈值 5
-        "intervalSec": 1,     # 统计窗口 1 秒
-        "controlBehavior": 0, # 快速失败
-        "burst": 0            # 无突发流量
-    },
-    {
-        "resource": "sample-api",
-        "resourceMode": 1,    # 自定义 API 限流
-        "grade": 1,
-        "count": 10,
-        "intervalSec": 1,
-        "controlBehavior": 0,
-        "burst": 0
-    }
+  {
+    "resource": "sample-route",
+    "resourceMode": 0,
+    #
+    路由限流
+    "grade": 1,
+    #
+    限流基于
+    QPS
+    "count": 5,
+    #
+    QPS
+    阈值
+    5
+    "intervalSec": 1,
+    #
+    统计窗口
+    1
+    秒
+    "controlBehavior": 0,
+    #
+    快速失败
+    "burst": 0
+    #
+    无突发流量
+  },
+  {
+    "resource": "sample-api",
+    "resourceMode": 1,
+    #
+    自定义
+    API
+    限流
+    "grade": 1,
+    "count": 10,
+    "intervalSec": 1,
+    "controlBehavior": 0,
+    "burst": 0
+  }
 ]
 ```
 
