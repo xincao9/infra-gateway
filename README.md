@@ -96,38 +96,17 @@ spring:
   {
     "resource": "sample-route",
     "resourceMode": 0,
-    #
-    路由限流
     "grade": 1,
-    #
-    限流基于
-    QPS
-    "count": 5,
-    #
-    QPS
-    阈值
-    5
+    "count": 1,
     "intervalSec": 1,
-    #
-    统计窗口
-    1
-    秒
     "controlBehavior": 0,
-    #
-    快速失败
     "burst": 0
-    #
-    无突发流量
   },
   {
     "resource": "sample-api",
     "resourceMode": 1,
-    #
-    自定义
-    API
-    限流
     "grade": 1,
-    "count": 10,
+    "count": 1,
     "intervalSec": 1,
     "controlBehavior": 0,
     "burst": 0
@@ -137,15 +116,15 @@ spring:
 
 #### 参数说明
 
-| 参数                | 说明                 | 可选值           |
-|-------------------|--------------------|---------------|
-| `resource`        | 限流资源（如路由 ID 或 API） | 自定义字符串        |
-| `resourceMode`    | 资源类型               | 0（路由）/ 1（API） |
-| `grade`           | 限流类型               | 1（QPS）        |
-| `count`           | 限流阈值               | 数值（如 5、10）    |
-| `intervalSec`     | 统计时间窗口（秒）          | 整数（如 1）       |
-| `controlBehavior` | 限流行为               | 0（快速失败）       |
-| `burst`           | 突发流量容量             | 0（禁用）或正整数     |
+| 参数                | 说明                 | 可选值                                   |
+|-------------------|--------------------|---------------------------------------|
+| `resource`        | 限流资源（如路由 ID 或 API） | 自定义字符串                                |
+| `resourceMode`    | 资源类型               | 0（路由）/ 1（API）                         |
+| `grade`           | 限流类型               | 0 (线程数) / 1（QPS）                      |
+| `count`           | 限流阈值               | 数值（如 5、10）                            |
+| `intervalSec`     | 统计时间窗口（秒）          | 整数（如 1）                               |
+| `controlBehavior` | 限流行为               | 0 (直接拒绝) / 1(预热) / 2(限流) / 3(预热 + 限流) |
+| `burst`           | 突发流量容量             | 0（禁用）或正整数                             |
 
 ---
 
