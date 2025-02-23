@@ -21,7 +21,7 @@ public class JwtPropertiesTest {
     public void testParseToken() {
         String subject1 = "xincao";
         try {
-            String token = jwtProperties.generatorToken(subject1, Collections.singletonMap("roles", "admin"), TimeUnit.DAYS.toMillis(1));
+            String token = jwtProperties.generatorToken(subject1, Collections.singletonMap("role", "admin"), TimeUnit.DAYS.toMillis(1));
             System.out.println(token);
             Claims claims = jwtProperties.parseToken(token);
             String subject2 = claims.getSubject();
